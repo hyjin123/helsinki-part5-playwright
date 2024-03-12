@@ -23,7 +23,6 @@ describe("Blog app", () => {
     test("succeeds with correct credentials", async ({ page }) => {
       await page.getByTestId("username").fill("mluukkai");
       await page.getByTestId("password").fill("salainen");
-
       await page.getByRole("button", { name: "Login" }).click();
 
       await expect(
@@ -40,6 +39,25 @@ describe("Blog app", () => {
       await expect(
         page.getByText("logged in as Matti Luukkainen")
       ).not.toBeVisible();
+    });
+  });
+
+  describe("when logged in", () => {
+    beforeEach(async ({ page }) => {
+      await page.getByTestId("username").fill("mluukkai");
+      await page.getByTestId("password").fill("salainen");
+      await page.getByRole("button", { name: "Login" }).click();
+    });
+
+    test("a new blog can be created", async ({ page }) => {
+      await page.getByRole("button", { name: "Create a new blog" }).click();
+      await page.getByTestId("title").fill("this is note to test");
+      await page.getByTestId("author").fill("Sean Jin");
+      await page.getByTestId("url").fill("www.google.ca");
+      await page.getByRole("button", { name: "submit" }).click();
+      await expect(
+        page.getByText("this is note to test - Sean Jin")
+      ).toBeVisible();
     });
   });
 });
