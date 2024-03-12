@@ -56,8 +56,28 @@ describe("Blog app", () => {
       await page.getByTestId("url").fill("www.google.ca");
       await page.getByRole("button", { name: "submit" }).click();
       await expect(
+        page.getByText("New Blog: this is note to test has been added!")
+      ).toBeVisible();
+      await expect(
         page.getByText("this is note to test - Sean Jin")
       ).toBeVisible();
+    });
+
+    describe("and a blog exists", () => {
+      beforeEach(async ({ page }) => {
+        await page.getByRole("button", { name: "Create a new blog" }).click();
+        await page.getByTestId("title").fill("this is note to test");
+        await page.getByTestId("author").fill("Sean Jin");
+        await page.getByTestId("url").fill("www.google.ca");
+        await page.getByRole("button", { name: "submit" }).click();
+      });
+
+      test("blog can be edited", async ({ page }) => {
+        await page.getByRole("button", { name: "view" }).click();
+        await page.getByRole("button", { name: "like" }).click();
+        await expect(page.getByText("You liked a blog!")).toBeVisible();
+        await expect(page.getByText("likes: 1")).toBeVisible();
+      });
     });
   });
 });
