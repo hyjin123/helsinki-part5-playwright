@@ -11,6 +11,14 @@ describe("Blog app", () => {
       },
     });
 
+    await request.post("http://localhost:3003/api/users", {
+      data: {
+        name: "Sean Jin",
+        username: "seanjin",
+        password: "secret",
+      },
+    });
+
     await page.goto("http://localhost:5173");
   });
 
@@ -100,6 +108,21 @@ describe("Blog app", () => {
         await expect(
           page.getByText("this is note to test - Sean Jin")
         ).not.toBeVisible();
+      });
+
+      test("only creator can see the remove button", async ({ page }) => {
+        await page.getByRole("button", { name: "view" }).click();
+        await expect(page.getByText("remove")).toBeVisible();
+
+        // log out and log in with a different user
+        await page.getByRole("button", { name: "logout" }).click();
+        await page.getByTestId("username").fill("seanjin");
+        await page.getByTestId("password").fill("secret");
+        await page.getByRole("button", { name: "Login" }).click();
+
+        // check to see that the new user cannot see the remove button
+        await page.getByRole("button", { name: "view" }).click();
+        await expect(page.getByText("remove")).not.toBeVisible();
       });
     });
   });
