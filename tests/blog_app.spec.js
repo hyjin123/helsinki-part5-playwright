@@ -78,6 +78,29 @@ describe("Blog app", () => {
         await expect(page.getByText("You liked a blog!")).toBeVisible();
         await expect(page.getByText("likes: 1")).toBeVisible();
       });
+
+      test("blog can be deleted", async ({ page }) => {
+        await page.getByRole("button", { name: "view" }).click();
+
+        // set the dialog before clicking on the remove button or the test fails
+        page.on("dialog", async (dialog) => {
+          expect(dialog.message()).toContain(
+            "Remove blog this is note to test by Sean Jin"
+          );
+          await dialog.accept();
+        });
+
+        await page.getByRole("button", { name: "remove" }).click();
+
+        await expect(
+          page.getByText(
+            "Blog: this is note to test by Sean Jin has been deleted!"
+          )
+        ).toBeVisible();
+        await expect(
+          page.getByText("this is note to test - Sean Jin")
+        ).not.toBeVisible();
+      });
     });
   });
 });
