@@ -124,6 +124,34 @@ describe("Blog app", () => {
         await page.getByRole("button", { name: "view" }).click();
         await expect(page.getByText("remove")).not.toBeVisible();
       });
+
+      describe("2 different blogs exists", () => {
+        beforeEach(async ({ page }) => {
+          // 2nd blog
+          await page.getByRole("button", { name: "Create a new blog" }).click();
+          await page.getByTestId("title").fill("2nd");
+          await page.getByTestId("author").fill("Sean Jin");
+          await page.getByTestId("url").fill("www.google.ca");
+          await page.getByRole("button", { name: "submit" }).click();
+        });
+
+        test("blogs are in the order of most likes", async ({ page }) => {
+          // by default, the first blog has 0 like
+          // like the 2nd blog once and hide the box
+          await page.locator(':nth-match(:text("view"), 2)').click();
+          await page.getByRole("button", { name: "like" }).click();
+          await page.getByRole("button", { name: "hide" }).click();
+
+          // click the first view button, it should have 1 like
+          await page.locator(':nth-match(:text("view"), 1)').click();
+          await expect(page.getByText("likes: 1")).toBeVisible();
+          await page.getByRole("button", { name: "hide" }).click();
+
+          // click the second view button, it should have 0 likes
+          await page.locator(':nth-match(:text("view"), 2)').click();
+          await expect(page.getByText("likes: 0")).toBeVisible();
+        });
+      });
     });
   });
 });
